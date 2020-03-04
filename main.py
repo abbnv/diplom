@@ -93,8 +93,9 @@ class VK:
         return all_friends_group_list
 
 
-TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
+if __name__ == '__main__':
+    TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
 
-friends = VK(token=TOKEN, user_id="eshmargunov")
-friends.run()
+    friends = VK(token=TOKEN, user_id="eshmargunov")
+    friends.run()
 
