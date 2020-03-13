@@ -1,5 +1,25 @@
 import requests
 import json
+import time
+
+
+# Небольшой класс для обработки исключений
+class APIError(Exception):
+    def __init__(self, text, error_code):
+        self.text = text
+        self.error_code = error_code
+
+        print("API VK Вернул ошибку")
+        print("Ошибка:", self.text)
+        print("Код ошибки:", self.error_code)
+
+        if self.error_code == 6:
+            print("Заснём на пару секунд")
+            time.sleep(2)
+
+        print("---" * 30)
+
+
 
 
 class VK:
@@ -36,30 +56,30 @@ class VK:
             json.dump(groups_result, f, indent=2, ensure_ascii=False)
 
     def make_request(self, method, **data):
+        # теперь для остальных методов будем делать execute с полученным user_id
         params = {
             'v': self.API_VERSION,
-            'access_token': self.token
+            'access_token': self.token,
         }
         params.update(data)
-        response = requests.get(url=f'{self.URL}/{method}', params=params)
+
+        response = requests.post(url=f'{self.URL}{method}', params=params)
         return response.json()
 
     def get_user_groups(self):
+
         print(f"Получаем список групп {self.user_id}")
+
         response = self.make_request('groups.get')
 
-        user_groups_count = response['response']['count']
-        user_groups_list = response['response']['items']
+        print(f"Список групп: {response['response']['items']}")
+        print("===" * 10)
 
-        print(f'У жервы {self.user_id} групп: {user_groups_count}')
-        print(f'Вот их ID: {user_groups_list}')
-
-        print("==="*10)
-
-        return user_groups_list
+        return response['response']['items']
 
     def get_user_friends_groups(self):
         print(f"Получаем список друзей {self.user_id}")
+
         response = self.make_request('friends.get')
 
         user_friends_count = response['response']['count']
@@ -76,14 +96,18 @@ class VK:
         for number, user in enumerate(user_friends_list):
             try:
                 response = self.make_request('groups.get', user_id=user)
-                user_friends_groups_count = response['response']['count']
-                user_friends_groups_list = response['response']['items']
-                print(f'У друга жертвы #{number} с ID: {user} групп: {user_friends_groups_count}')
-                print(f'Вот их ID: {user_friends_groups_list}')
-                print("---" * 30)
+                if 'error' in response:
+                    raise APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
+                else:
+                    user_friends_groups_count = response['response']['count']
+                    user_friends_groups_list = response['response']['items']
+                    print(f'У друга жертвы #{number} с ID: {user} групп: {user_friends_groups_count}')
+                    print(f'Вот их ID: {user_friends_groups_list}')
+                    print("---" * 30)
+
                 for gr in user_friends_groups_list:
                     all_friends_group_list.append(gr)
-            except KeyError as e:
+            except APIError as e:
                 print(e)
 
         print("===" * 10)
@@ -94,8 +118,10 @@ class VK:
 
 
 if __name__ == '__main__':
-    TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
-
-    friends = VK(token=TOKEN, user_id="eshmargunov")
+    TOKEN = input("Введите токен: ")
+    USER_ID = input("Введите user_id: ")
+    # '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
+    # eshmargunov
+    friends = VK(token=TOKEN, user_id=USER_ID)
     friends.run()
 
