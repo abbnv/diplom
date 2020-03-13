@@ -20,8 +20,6 @@ class APIError(Exception):
         print("---" * 30)
 
 
-
-
 class VK:
     URL = 'https://api.vk.com/method/'
     API_VERSION = '5.52'
