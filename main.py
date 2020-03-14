@@ -104,6 +104,7 @@ class VK:
                 if response['error']['error_code'] == 6:
                     print("Заснём на пару секунд")
                     time.sleep(2)
+                    i -= 1
                     assert APIError("Ошибка: превышено количество запросов", error_code=6)
                 else:
                     assert APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
