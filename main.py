@@ -90,26 +90,27 @@ class VK:
 
         i = 0
         for number, user in enumerate(user_friends_list):
-            try:
-                response = self.make_request('groups.get', user_id=user)
-                if 'error' in response:
-                    raise APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
-                else:
-                    user_friends_groups_count = response['response']['count']
-                    user_friends_groups_list = response['response']['items']
-                    print(f'У друга жертвы #{number} с ID: {user} групп: {user_friends_groups_count}')
-                    print(f'Вот их ID: {user_friends_groups_list}')
-                    print("---" * 30)
-
+            response = self.make_request('groups.get', user_id=user)
+            if 'response' in response:
+                user_friends_groups_count = response['response']['count']
+                user_friends_groups_list = response['response']['items']
+                print(f'У друга жертвы #{number} с ID: {user} групп: {user_friends_groups_count}')
+                print(f'Вот их ID: {user_friends_groups_list}')
+                print("---" * 30)
                 for gr in user_friends_groups_list:
                     all_friends_group_list.append(gr)
                 i += 1
-            except APIError as e:
-                print(e)
-                if response['error']['error_msg'] == 6:
-                    i -= 1
-                    print("Заснём на пару секунд...")
+            elif 'error' in response:
+                if response['error']['error_code'] == 6:
+                    print("Заснём на пару секунд")
                     time.sleep(2)
+                    assert APIError("Ошибка: превышено количество запросов", error_code=6)
+                else:
+                    assert APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
+                    i += 1
+
+            if i >= len(user_friends_list):
+                break
 
         print("===" * 10)
 
@@ -119,8 +120,10 @@ class VK:
 
 
 if __name__ == '__main__':
-    TOKEN = input("Введите токен: ")
-    USER_ID = input("Введите user_id: ")
+    # TOKEN = input("Введите токен: ")
+    # USER_ID = input("Введите user_id: ")
+    TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
+    USER_ID = 'eshmargunov'
     # '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
     # eshmargunov
     friends = VK(token=TOKEN, user_id=USER_ID)
