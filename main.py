@@ -13,10 +13,6 @@ class APIError(Exception):
         print("Ошибка:", self.text)
         print("Код ошибки:", self.error_code)
 
-        if self.error_code == 6:
-            print("Заснём на пару секунд")
-            time.sleep(2)
-
         print("---" * 30)
 
 
@@ -91,6 +87,8 @@ class VK:
         print("Получаем список групп этих друзей")
         # test_list = [4929, 7858, 11952, 48807, 58439, 71491, 75458, 78540, 105932, 143611, 144253, 193264, 209254]
         all_friends_group_list = []
+
+        i = 0
         for number, user in enumerate(user_friends_list):
             try:
                 response = self.make_request('groups.get', user_id=user)
@@ -105,8 +103,13 @@ class VK:
 
                 for gr in user_friends_groups_list:
                     all_friends_group_list.append(gr)
+                i += 1
             except APIError as e:
                 print(e)
+                if response['error']['error_msg'] == 6:
+                    i -= 1
+                    print("Заснём на пару секунд...")
+                    time.sleep(2)
 
         print("===" * 10)
 
