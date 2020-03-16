@@ -89,8 +89,6 @@ class VK:
         all_friends_group_list = []
 
         i = 0
-        print(len(user_friends_list))
-        print(user_friends_count)
         while True:
             if i >= len(user_friends_list):
                 break
@@ -122,12 +120,11 @@ class VK:
 
 
 if __name__ == '__main__':
-    # TOKEN = input("Введите токен: ")
-    # USER_ID = input("Введите user_id: ")
-    TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
-    USER_ID = 'eshmargunov'
-    # '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
-    # eshmargunov
+    TOKEN = input("Введите токен: ")
+    USER_ID = input("Введите user_id: ")
+    # TOKEN = '73eaea320bdc0d3299faa475c196cfea1c4df9da4c6d291633f9fe8f83c08c4de2a3abf89fbc3ed8a44e1'
+    # USER_ID = 'eshmargunov'
+
     friends = VK(token=TOKEN, user_id=USER_ID)
     friends.run()
 
