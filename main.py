@@ -89,29 +89,30 @@ class VK:
         all_friends_group_list = []
 
         i = 0
-        for number, user in enumerate(user_friends_list):
-            response = self.make_request('groups.get', user_id=user)
-            if 'response' in response:
-                user_friends_groups_count = response['response']['count']
-                user_friends_groups_list = response['response']['items']
-                print(f'У друга жертвы #{number} с ID: {user} групп: {user_friends_groups_count}')
-                print(f'Вот их ID: {user_friends_groups_list}')
-                print("---" * 30)
-                for gr in user_friends_groups_list:
-                    all_friends_group_list.append(gr)
-                i += 1
-            elif 'error' in response:
-                if response['error']['error_code'] == 6:
-                    print("Заснём на пару секунд")
-                    time.sleep(2)
-                    i -= 1
-                    assert APIError("Ошибка: превышено количество запросов", error_code=6)
-                else:
-                    assert APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
-                    i += 1
-
+        print(len(user_friends_list))
+        print(user_friends_count)
+        while True:
             if i >= len(user_friends_list):
                 break
+            else:
+                response = self.make_request('groups.get', user_id=user_friends_list[i])
+                if 'response' in response:
+                    user_friends_groups_count = response['response']['count']
+                    user_friends_groups_list = response['response']['items']
+                    print(f'У друга жертвы #{i} с ID: {user_friends_list[i]} групп: {user_friends_groups_count}')
+                    print(f'Вот их ID: {user_friends_groups_list}')
+                    print("---" * 30)
+                    for gr in user_friends_groups_list:
+                        all_friends_group_list.append(gr)
+                    i += 1
+                elif 'error' in response:
+                    if response['error']['error_code'] == 6:
+                        print("Заснём на пару секунд")
+                        time.sleep(2)
+                        assert APIError("Ошибка: превышено количество запросов", error_code=6)
+                    else:
+                        assert APIError(text=response['error']['error_msg'], error_code=response['error']['error_code'])
+                        i += 1
 
         print("===" * 10)
 
